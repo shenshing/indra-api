@@ -1,3 +1,5 @@
+// extern crate subwallet;
+
 use subwallet::wallet::*;
 use rustbreak::FileDatabase;
 use rustbreak::deser::Bincode;
