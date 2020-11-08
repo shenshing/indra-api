@@ -156,24 +156,45 @@ pub fn encrypt_mnemonic(name: String, mnemonic: String, accountid: String, passw
 
     let read_result = fs::read(path).expect("Error reading file in get_mnemonic");
     let str_result = str::from_utf8(&read_result).unwrap();
-    let mut data_deserialize: Mnemonics = serde_json::from_str(&str_result).unwrap();
     
-    data_deserialize.mnemonics.push(user);
+    if read_result.is_empty() {
+        let mut vec_mnemonic: Vec<Mnemonic_Encrypt> = Vec::new();
+        vec_mnemonic.push(user);
+        let mnemonic_instance = Mnemonics {
+            mnemonics: vec_mnemonic,
+        };
+        let mut json_mnemonic_str = serde_json::to_string_pretty(&mnemonic_instance).unwrap();
+        match file.write_all(&json_mnemonic_str.as_bytes()) {
+            Err(why) => {
+                // file.close();
+                // drop(file);
+                return format!("couldn't write to {}: {}", display, why);
+            },
+            Ok(_) => {
+                // file.close();
+                // drop(file);
+                return format!("successfully wrote to {}", display);
+            }
+        }
+    } else {
+        let mut data_deserialize: Mnemonics = serde_json::from_str(&str_result).unwrap();
+        data_deserialize.mnemonics.push(user);
 
-    let mnemonic_instance = Mnemonics {
-        mnemonics: data_deserialize.mnemonics,
-    };
-
-    let mut json_mnemonic_str = serde_json::to_string_pretty(&mnemonic_instance).unwrap();
-
-    match file.write_all(&json_mnemonic_str.as_bytes()) {
-        Err(why) => {
-            drop(file);
-            return format!("couldn't write to {}: {}", display, why);
-        },
-        Ok(_) => {
-            drop(file);
-            return format!("successfully wrote to {}", display);
+        let mnemonic_instance = Mnemonics {
+            mnemonics: data_deserialize.mnemonics,
+        };
+        let mut json_mnemonic_str = serde_json::to_string_pretty(&mnemonic_instance).unwrap();
+        match file.write_all(&json_mnemonic_str.as_bytes()) {
+            Err(why) => {
+                // file.close();
+                // drop(file);
+                return format!("couldn't write to {}: {}", display, why);
+            },
+            Ok(_) => {
+                // file.close();
+                // drop(file);
+                return format!("successfully wrote to {}", display);
+            }
         }
     }
 
