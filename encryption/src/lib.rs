@@ -1,1 +1,1 @@
-mod mnemonic;
+pub mod mnemonic;
