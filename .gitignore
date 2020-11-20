@@ -1,2 +1,6 @@
 /db/target/
 /encryption/target/
+/database/target/
+/database/.env/
+/account/target/
+/account/.env/
