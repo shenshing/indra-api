@@ -87,15 +87,15 @@ pub struct Register {
     pub temp_token:     String,
     pub status_id:      String,
 }
-pub fn insert_new_register(new_register: Register, connection: &PgConnection) {
+pub fn insert_new_register(new_register: Register, connection: &PgConnection) -> Result<String, String> {
     match diesel::insert_into(users::table)
         .values(&new_register)
         .execute(connection) {
             Ok(_) => {
-                println!("insert new account successful");
+                return Ok(format!("insert new account successful"));
             },
             Err(err) => {
-                println!("error saving new account {}", err);
+                return Err(format!("Error: {}", err));
         }
     }
 }
@@ -110,30 +110,32 @@ pub struct SetupWallet {
     pub created_by: String     
 }
 
-pub fn insert_for_setup_wallet(new_wallet: SetupWallet, connection: &PgConnection) {
+pub fn insert_for_setup_wallet(new_wallet: SetupWallet, connection: &PgConnection) -> Result<String, String> {
     match diesel::insert_into(users::table)
         .values(&new_wallet)
         .execute(connection) {
             Ok(_) => {
-                println!("insert new wallet successful");
+                // println!("insert new wallet successful");
+                return Ok(format!("insert new wallet successful"));
             },
             Err(err) => {
-                println!("error saving new wallet {}", err);
+                // println!("error saving new wallet {}", err);
+                return Err(format!("error saving new wallet {}", err));
             }
     }
 }
 
-pub fn get_all_users(connection: &PgConnection) -> Vec<Users> {
-    use database::schema::users::dsl::*;
-
-    let user_list = users.load::<Users>(connection)
-        .expect("Error retrieve user from database");
-    return user_list;
+pub fn get_all_users(connection: &PgConnection) -> Result<Vec<Users>, String> {
+    use database::schema::users::dsl::users;
+    match users.load::<Users>(connection) {
+        Ok(user) => return Ok(user),
+        Err(err) => return Err(format!("Error: {}", err)),
+    }
 }
 
 pub fn get_user_by_email(email_: String, connection: &PgConnection) -> Result<Users, String> {
     use database::schema::users::dsl::{users, email};
-    match users.filter(email.like(email_))
+    match users.filter(email.eq(email_))
         .get_result(connection) {
             Ok(user) => return Ok(user),
             Err(err) => return Err(format!("Error: {}", err))

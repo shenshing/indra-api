@@ -1,0 +1,10 @@
+-- Your SQL goes here
+CREATE TABLE IF NOT EXISTS HASHVAL (
+    ID VARCHAR (36) PRIMARY KEY,
+    HASHS TEXT,
+    IS_VALID BOOLEAN NOT NULL default TRUE,
+    CREATED_AT timestamp NOT NULL default current_timestamp,
+    CREATED_BY VARCHAR (36),
+    UPDATED_BY VARCHAR (36) 
+)
+
